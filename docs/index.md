@@ -4,7 +4,7 @@ layout: home
 
 hero:
   name: "Microsites"
-  text: "Microsites documentation"
+  text: "Placetopay Microsites documentation"
   tagline: My great project tagline
   actions:
     - theme: brand
