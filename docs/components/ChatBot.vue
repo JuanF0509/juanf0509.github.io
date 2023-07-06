@@ -127,8 +127,8 @@ const markdownContent = ref('');
 
 let idk = ref('')
 onMounted(async () => {
-  const response = await fetch('/markdown-examples.md');
-  const markdownText = await response.text();
+  const response = await axios.get('/markdown-examples.md');
+  const markdownText = await response.data;
 
   const div = document.createElement('div');
   div.innerHTML = markdownText
