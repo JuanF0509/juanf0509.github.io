@@ -2,16 +2,17 @@ import { defineConfig } from 'vitepress'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-
+  
   title: "Microsites",
   description: "Microsites documentation",
   themeConfig: {
-    logo: 'favicon.ico',
+    logo: 'P2P_Logo.svg',
+    siteTitle: false,
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/markdown-examples' },
-      { text: 'Chat', link: 'https://www.youtube.com/', target: '_self' }
+      { text: 'Inicio', link: '/' },
+      { text: 'Documentación', link: '/introduction' },
+      { text: 'Chatbot', link: '/chatbot', target: '_blank' }
     ],
 
     head: [
@@ -26,17 +27,23 @@ export default defineConfig({
 
     sidebar: [
       {
-        text: 'Examples',
+        text: 'Micrositios',
+        items: [
+          { text: 'Introducción', link: '/introduction' },
+          { text: '¿Cómo funcionan?', link: '/about-it' }
+        ]
+      },
+      {
+        text: 'Integración',
         items: [
           { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' },
-          { text: 'Chat', link: '/chat' }
+          { text: 'Runtime API Examples', link: '/api-examples' }
         ]
       }
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' },
+      { icon: 'github', link: 'https://github.com/JuanF0509/juanf0509.github.io' },
     ]
   }
 })

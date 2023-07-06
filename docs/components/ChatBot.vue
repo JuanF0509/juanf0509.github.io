@@ -127,7 +127,7 @@ const markdownContent = ref('');
 
 let idk = ref('')
 onMounted(async () => {
-  const response = await fetch('/markdown-examples.md');
+  const response = await fetch('http://localhost:5173/markdown-examples.html');
   const markdownText = await response.text();
 
   const div = document.createElement('div');
