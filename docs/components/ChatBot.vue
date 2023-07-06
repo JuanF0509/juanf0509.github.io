@@ -122,30 +122,39 @@
 import axios from 'axios';
 import {ref, onMounted} from "vue";
 import MarkdownIt from 'markdown-it';
-import removeMarkdown from "markdown-to-text";
 
 const markdownContent = ref('');
 
 let idk = ref('')
-
-
 onMounted(async () => {
-
-
-  const response = await axios.get('/public/banana.md');
-  const pruebita = removeMarkdown(response.data)
-  console.log(pruebita)
-  const markdownText = await response.data;
+  const response = await fetch('http://localhost:5173/markdown-examples.html');
+  const markdownText = await response.text();
 
   const div = document.createElement('div');
   div.innerHTML = markdownText
 
-  const desc1Element = div.querySelector('#yep');
+  const desc1Element = div.querySelector('#desc1');
   const desc1Text = desc1Element ? desc1Element.textContent : null;
 
+  idk.value = desc1Text
 
-  idk.value = desc1Text;
   console.log('desc1Id :' + desc1Text)
+  // markdownContent.value = htmlContent;
+
+    // const dat = htmlContent.querySelector('#desc1');
+    // console.log('dat :' + dat)
+    // if (dat) {
+    //   idk.value = dat.textContent;
+    //   console.log('Texto extraido:', idk.value);
+    // } else {
+    // console.error('Error fetching introduction content:')
+    // }
+
+  // console.log('response :' + response )
+  // console.log('markdownText :' + markdownText )
+  // console.log('md :' + md )
+  // console.log('htmlContent :' + htmlContent )
+  // console.log('markdownContent :' + markdownContent.value )
 });
 
 

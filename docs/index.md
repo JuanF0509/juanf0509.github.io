@@ -3,23 +3,23 @@
 layout: home
 
 hero:
-  name: "Microsites"
-  text: "By PlaceToPay"
-  tagline: Esta es la descripcion para micrositios
+  name: "Micrositios"
+  text: "Documentación"
+  tagline: Tenemos cientos de comercios para que realizar tu proceso de pago sea más fácil y en un solo lugar
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
+      text: Introducción
+      link: /introduction
     - theme: alt
-      text: API Examples
+      text: Integración
       link: /api-examples
-
+  
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: Dashboards
+    details: Panel o consola administrativa que te permite visualizar transacciones como reversos y reembolsos; entre otros. Además de visualizar la data.
+  - title: Link de pagos
+    details: Facilita la forma de pago a tus clientes enviando links desde WhatsApp, correo electrónico o por redes sociales.
+  - title: Código QR
+    details: Implementa pagos sin contacto ofreciendo a tus clientes la posibilidad de pagar a través de un código QR.
 ---
 

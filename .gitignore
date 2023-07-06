@@ -43,6 +43,7 @@ node_modules/
 jspm_packages/
 .vitepress/dist
 .vitepress/cache
+docs/.vitepress/cache
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
