@@ -37,7 +37,8 @@ export default defineConfig({
         text: 'Integración',
         items: [
           { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' }
+          { text: 'Runtime API Examples', link: '/api-examples' },
+          { text: 'banana', link: '/public/banana' },
         ]
       }
     ],

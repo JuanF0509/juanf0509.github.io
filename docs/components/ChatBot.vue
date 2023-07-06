@@ -127,13 +127,13 @@ const markdownContent = ref('');
 
 let idk = ref('')
 onMounted(async () => {
-  const response = await fetch('http://localhost:5173/markdown-examples.html');
-  const markdownText = await response.text();
+  const response = await axios.get('/public/banana.md');
+  const markdownText = await response.data;
 
   const div = document.createElement('div');
   div.innerHTML = markdownText
 
-  const desc1Element = div.querySelector('#desc1');
+  const desc1Element = div.querySelector('#yep');
   const desc1Text = desc1Element ? desc1Element.textContent : null;
 
   idk.value = desc1Text
