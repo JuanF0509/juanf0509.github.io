@@ -1,8 +1,34 @@
-# Markdown Extension Examples
+<!-- <script setup>
+import { ref } from 'vue'
 
-This page demonstrates some of the built-in markdown extensions provided by VitePress.
+const count = ref('0')
 
-## Syntax Highlighting
+const alertusky = () => {
+  alert('En base de datos hay: ' + count.value + ' Bananas')
+}
+
+</script> -->
+
+# Banana
+
+<div id="desc1">Probando descripcion Banana</div>
+
+<!-- 
+<button :class="$style.button" @click="count++">Incrementa una banana</button>
+
+<button @click="alertusky()">Numero de bananas en base de datos</button> -->
+
+Numero de bananas en pantalla: {{ count }}
+<button class="bg-red-600 border-2 border-red-400 rounded-md py-10 px-2 font-bold shadow-md shadow-red-200">Suscribete -></button>
+
+<style module>
+.button {
+  color: red;
+  font-weight: bold;
+}
+</style>
+
+## Banana
 
 VitePress provides Syntax Highlighting powered by [Shiki](https://github.com/shikijs/shiki), with additional features like line-highlighting:
 
