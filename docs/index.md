@@ -4,8 +4,8 @@ layout: home
 
 hero:
   name: "Microsites"
-  text: "Placetopay Microsites documentation"
-  tagline: My great project tagline
+  text: "By PlaceToPay"
+  tagline: Esta es la descripcion para micrositios
   actions:
     - theme: brand
       text: Markdown Examples
