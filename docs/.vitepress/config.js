@@ -30,6 +30,7 @@ export default defineConfig({
         items: [
           { text: 'Markdown Examples', link: '/markdown-examples' },
           { text: 'Runtime API Examples', link: '/api-examples' },
+          { text: 'banana', link: '/public/banana' },
           { text: 'Chat', link: '/chat' }
         ]
       }

@@ -11,7 +11,7 @@ const alertusky = () => {
 
 # Banana
 
-<div id="desc1">Probando descripcion Banana</div>
+<div ref="desc1">Probando descripcion Banana</div>
 
 <!-- 
 <button :class="$style.button" @click="count++">Incrementa una banana</button>
