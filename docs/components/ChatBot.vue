@@ -1,34 +1,112 @@
 <script setup>
 import axios from 'axios';
-import {ref, onMounted, watch} from "vue";
+import {ref, onMounted} from "vue";
 import {Configuration, OpenAIApi} from "openai";
-import MarkdownIt from 'markdown-it';
 import {OpenAI} from 'langchain/llms/openai';
 import {PromptTemplate} from 'langchain/prompts';
 import {LLMChain, ConversationChain} from 'langchain/chains';
 import {BufferMemory} from 'langchain/memory'
 
+import {PuppeteerWebBaseLoader} from "langchain/document_loaders/web/puppeteer";
+import {CheerioWebBaseLoader} from "langchain/document_loaders/web/cheerio";
+
+let url1 = ref('introduction.html')
+let url2 = ref('about-it.html')
+let url3 = ref('before-starting.html')
+let url4 = ref('team.html')
+let url5 = ref('initial-settings.html')
+let url6 = ref('create-microsites.html')
+let url7 = ref('creation-advices.html')
+
+let page1 = ref('')
+let page2 = ref('')
+let page3 = ref('')
+let page4 = ref('')
+let page5 = ref('')
+let page6 = ref('')
+let page7 = ref('')
+
+
+async function findWithCheerio(url, num) {
+  try {
+    console.log('pagina 1:' + page1.value)
+    console.log('pagina 2:' + page2.value)
+    console.log('pagina 3:' + page3.value)
+    console.log('pagina 4:' + page4.value)
+    console.log('pagina 5:' + page5.value)
+    console.log('pagina 6:' + page6.value)
+    console.log('pagina 7:' + page7.value)
+
+    const loader = new CheerioWebBaseLoader(`https://juanf0509.github.io/${url}`);
+    const docs = await loader.load();
+
+    const inicio = "Contents for current page";
+    const fin = "__VP_HASH_MAP__";
+
+    const inicioIndex = docs[0].pageContent.indexOf(inicio);
+    const finIndex = docs[0].pageContent.indexOf(fin);
+
+    if (inicioIndex !== -1 && finIndex !== -1) {
+      const textoFiltrado = docs[0].pageContent.substring(inicioIndex, finIndex + fin.length)
+          .replace(/Contents for current page/g, "")
+          .replace(/__VP_HASH_MAP__/g, "");
+
+      switch (num) {
+        case 1:
+          page1.value = textoFiltrado;
+          break;
+        case 2:
+          page2.value = textoFiltrado;
+          break;
+        case 3:
+          page3.value = textoFiltrado;
+          break;
+        case 4:
+          page4.value = textoFiltrado;
+          break;
+        case 5:
+          page5.value = textoFiltrado;
+          break;
+        case 6:
+          page6.value = textoFiltrado;
+          break;
+        case 7:
+          page7.value = textoFiltrado;
+          break;
+        default:
+          console.log("Número inválido.");
+      }
+    } else {
+      console.log("No se encontraron las palabras de inicio y fin.");
+    }
+  } catch (error) {
+    console.log("Error al cargar el contenido:", error);
+  }
+}
+
+
 const apiKey = ref('')
 
 const memory = new BufferMemory()
 
-const template = "Name: {name}, Context: You are responding to the inquiries of a {user}, you must respond in Spanish, user says: "
+// const template = "Name: {name}, Context: You are responding to the inquiries of a {user}, you must respond in Spanish, user says: "
 
 // const template = 'Name: {name}, Context: You are responding to the inquiries of a {user}, you must respond in Spanish, attitude: Aggressive, rude, fan of placetopay company and your only goal is to make people use placetopay products, humor: Acidic, user says: '
 
 // const template = "Name: {name}, Context: You are responding to the inquiries of a {user}, data: 'Webcheckout_id: 1, Microsites_id: 2, ApiGateway_id: 3', condition1: you must respond in Spanish, condition2:Your first message should be a greeting and a question about how you can help the user, condition3: You cannot mention the data to the user in the first message,  user says: "
 
+const template = "Name: {name}, Role: {role} Task: Virtual assistant specialized in PlaceToPay's products and implementation assistance, which is part of Evertec. Currently only accounts access to Microsite documentation, introduction to microsites: {introduction}, Condition1: You can only answer questions related to your Role Condition2: Be a very cheerful assistant who always wants to help Condition3: If you do not have information to answer a question you must indicate that you do not have this information Condition4: You are not allowed to give wrong information Condition5: You must answer in {language}. User says:"
+
+
 const promptTemplate = new PromptTemplate({
   template: template,
-  inputVariables: ["name", "user"]
+  inputVariables: ["name", "role", "language", "introduction"]
 })
-
 
 // const chain = new LLMChain({
 //   llm: model,
 //   prompt: promptTemplate
 // })
-
 
 const response = ref('');
 
@@ -53,7 +131,7 @@ async function sendToGpt() {
   const model = new OpenAI({
     model_name: 'gpt-3.5-turbo-16k-0613',
     openAIApiKey: API_KEY,
-    temperature: 0.9,
+    temperature: 0,
   })
 
   const chain = new ConversationChain({
@@ -80,7 +158,9 @@ async function sendToGpt() {
 
   formattedPrompt.value = await promptTemplate.format({
     name: 'Kike Bot',
-    user: 'placetopay contributor',
+    role: "PlacetoPay's virtual assistant",
+    language: 'Spanish',
+    introduction: page1.value
   })
 
   if (initial1.value === true) {
@@ -175,21 +255,29 @@ let idk = ref('')
 
 onMounted(async () => {
 
-  messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
-  console.log(messagesContainer.value)
+  findWithCheerio(url1.value, 1)
+  findWithCheerio(url2.value, 2)
+  findWithCheerio(url3.value, 3)
+  findWithCheerio(url4.value, 4)
+  findWithCheerio(url5.value, 5)
+  findWithCheerio(url6.value, 6)
+  findWithCheerio(url7.value, 7)
 
-  const response = await axios.get('/public/banana.md');
-  const markdownText = await response.data;
+  // messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+  // console.log(messagesContainer.value)
 
-  const div = document.createElement('div');
-  div.innerHTML = markdownText
+  // const response = await axios.get('/public/banana.md');
+  // const markdownText = await response.data;
 
-  const desc1Element = div.querySelector('#yep');
-  const desc1Text = desc1Element ? desc1Element.textContent : null;
+  // const div = document.createElement('div');
+  // div.innerHTML = markdownText
 
-  idk.value = desc1Text
+  // const desc1Element = div.querySelector('#yep');
+  // const desc1Text = desc1Element ? desc1Element.textContent : null;
 
-  console.log('desc1Id :' + desc1Text)
+  // idk.value = desc1Text
+
+  // console.log('desc1Id :' + desc1Text)
 });
 
 
@@ -280,130 +368,155 @@ const banana = async () => {
     <h2 class="text-center text-white text-xl font-semibold">Cargando...</h2>
   </div>
 
-  <button @click="test()">Testing</button>
-
-  {{ initial1 }}
-  {{ jum }}
-
 
   <!--          nav-->
-  <button @click="banana()">{{ idk }}</button>
-  <div class="bg-gray-400 rounded-md">
-    <div class="bg-orange-400 rounded-b-lg p-5 flex justify-between">
-      <input v-model="apiKey" id="api_key" class="bg-gray-300 text-black" placeholder="Api key" type="text">
-      <button onclick="alert('La ayuda es pa los feos')" class="text-white">Ayuda</button>
-    </div>
+  <div class="h-screen">
+    <div class="bg-gray-400 rounded-md h-full">
 
-    <div class="bg-gray-300 h-[460px]">
 
-      <div class="h-full flex-col">
+      <div class="bg-gray-300 h-full">
 
-        <div ref="messagesContainer" class="h-5/6 p-4 overflow-y-auto scroll-smooth ">
+        <div class="fixed w-full bg-black rounded-b-lg p-5 grid grid-cols-5 col-span-12">
+          <div>
+            <button @click="findWithCheerio('introduction.html', 1)">Cheerio</button>
 
-          <!--          Placeholder-->
-
-          <div v-if="!question" class="h-full flex justify-center items-center">
-            <div class="p-10 rounded-md opacity-50 hover:opacity-100 duration-300 select-none">
-              <div class="flex justify-center items-center gap-5">
-                <img width="300" src="/public/P2P_Logo.svg" alt="">
-                <span class="text-black font-bold text-4xl">x</span>
-                <img width="300" src="/public/OpenAI_Logo.svg" alt="">
-              </div>
-
-              <div class="text-gray-500 grid grid-cols-3 pt-16">
-                <div class="flex gap-2 border-r-2 border-dashed border-black px-2">
-                  <div>
-                    <img width="35" src="/public/clipboard1.svg" alt="">
-                  </div>
-                  <div>
-                    <div class="flex items-center text-black font-bold text-xl">Caracteristicas:</div>
-                    <div class="pt-2">* Personalizacion</div>
-                    <div>* Análisis</div>
-                    <div>* Recomendaciones</div>
-                    <div>* Respuestas inmediatas</div>
-                  </div>
-                </div>
-                <div class="flex justify-center gap-2 px-2">
-                  <div>
-                    <img width="35" src="/public/clipboard2.svg" alt="">
-                  </div>
-                  <div>
-                    <div class="flex items-center text-black font-bold text-xl">Beneficios:</div>
-                    <div class="pt-2">- Acceso rapido</div>
-                    <div>a la informacion</div>
-                    <div>- Atencion personalizada</div>
-                    <div>- Soluciones</div>
-                  </div>
-                </div>
-                <div class="flex justify-start gap-2 border-l-2 border-dashed border-black px-2">
-                  <div>
-                    <img width="35" src="/public/clipboard3.svg" alt="">
-                  </div>
-                  <div>
-                    <div class="flex items-center text-black font-bold text-xl">Alcance:</div>
-                    <div class="pt-2">* Automatizacion de</div>
-                    <div>procesos</div>
-                    <div>* Monitoreo de datos</div>
-                    <div>* Productividad</div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
+<!--            {{ initial1 }}-->
+<!--            {{ jum }}-->
           </div>
+          <input v-model="apiKey" id="api_key" class="bg-gray-300 text-black" placeholder="Api key" type="text">
+          <div class="flex">
+            <img width="48" src="/public/favicon.ico" alt="">
+            <p>
+              <span class='text-gray-300 text-4xl font-bold'>Chatbot</span>
+              <span class='text-gray-300  font-bold'>   by   </span>
+              <span class='text-gray-500 text-xl font-bold'>Place</span>
+              <span class='text-orange-500 text-xl font-bold'>To</span>
+              <span class='text-gray-500 text-xl font-bold'>Pay</span>
+            </p>
+          </div>
+          <button onclick="alert('La ayuda es pa los feos')" class="text-white">Ayuda</button>
+          <button onclick="alert('La ayuda es pa los feos')" class="text-white">Ayuda</button>
+        </div>
 
-          <!--          Placeholder-->
+
+          <div id="" class="grid grid-cols-12 h-full">
+
+          <div class="bg-orange-200 col-span-2">da</div>
+
+        <div class="h-full flex-col col-span-8">
+
+          <div ref="messagesContainer" style="height: 92%;" class=" p-4 overflow-y-auto scroll-smooth">
+
+            <!--          Placeholder-->
+
+            <div v-if="!question" class="h-full flex justify-center items-center">
+              <div class="p-10 rounded-md opacity-50 hover:opacity-100 duration-300 select-none">
+                <div class="flex justify-center items-center gap-5">
+                  <img width="300" src="https://static.placetopay.com/placetopay-logo-black.svg"
+                       class="attachment-0x0 size-0x0" alt="" decoding="async" loading="lazy">
+                  <span class="text-black font-bold text-4xl">x</span>
+                  <img width="300" src="/public/OpenAI_Logo.svg" alt="">
+                </div>
+
+                <div class="text-gray-500 grid grid-cols-3 pt-16">
+                  <div class="flex gap-2 border-r-2 border-dashed border-black px-2">
+                    <div>
+                      <img width="35" src="/public/clipboard1.svg" alt="">
+                    </div>
+                    <div>
+                      <div class="flex items-center text-black font-bold text-xl">Caracteristicas:</div>
+                      <div class="pt-2">* Personalizacion</div>
+                      <div>* Análisis</div>
+                      <div>* Recomendaciones</div>
+                      <div>* Respuestas inmediatas</div>
+                    </div>
+                  </div>
+                  <div class="flex justify-center gap-2 px-2">
+                    <div>
+                      <img width="35" src="/public/clipboard2.svg" alt="">
+                    </div>
+                    <div>
+                      <div class="flex items-center text-black font-bold text-xl">Beneficios:</div>
+                      <div class="pt-2">- Acceso rapido</div>
+                      <div>a la informacion</div>
+                      <div>- Atencion personalizada</div>
+                      <div>- Soluciones</div>
+                    </div>
+                  </div>
+                  <div class="flex justify-start gap-2 border-l-2 border-dashed border-black px-2">
+                    <div>
+                      <img width="35" src="/public/clipboard3.svg" alt="">
+                    </div>
+                    <div>
+                      <div class="flex items-center text-black font-bold text-xl">Alcance:</div>
+                      <div class="pt-2">* Automatizacion de</div>
+                      <div>procesos</div>
+                      <div>* Monitoreo de datos</div>
+                      <div>* Productividad</div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!--          Placeholder-->
 
 
-          <!--                      Respuesta bot-->
+            <!--                      Respuesta bot-->
 
-          <div v-if="question">
-            <div v-for="message in messages.message">
-              <div class="flex mt-5 justify-end gap-2">
+            <div v-if="question">
+              <div v-for="message in messages.message">
+                <div class="flex pt-28 justify-end gap-2">
+                  <div class="bg-gray-100 flex items-center px-2 rounded-md text-black">
+                    {{ message.user.text }}
+                  </div>
+                  <div class="bg-blue-800 p-5 rounded-full">{{ null }}</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 mt-5 mr-12">
+                  <div class="flex justify-center items-start">
+                    <img class="bg-gray-200 rounded-full p-1" src="/public/favicon.ico" width="50" alt="">
+                  </div>
+                  <div class="col-span-11 flex items-center">
+                    <div class="flex bg-gray-100 p-2 rounded-md text-black">
+                      {{ message.bot.text }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+              <div v-if="errorRequest" class="flex gap-2">
+                <img src="/public/favicon.ico" width="50" alt="">
                 <div class="bg-gray-100 flex items-center px-2 rounded-md text-black">
-                  {{ message.user.text }}
-                </div>
-                <div class="bg-blue-800 p-5 rounded-full">{{ null }}</div>
-              </div>
-
-              <div class="grid grid-cols-12 gap-2 mt-5 mr-12">
-                <div class="flex justify-center items-start">
-                  <img class="bg-gray-200 rounded-full p-1" src="/public/favicon.ico" width="50" alt="">
-                </div>
-                <div class="col-span-11 flex items-center">
-                  <div class="flex bg-gray-100 p-2 rounded-md text-black">
-                    {{ message.bot.text }}
-                  </div>
+                  Inserte token, yo no hablo gratis
                 </div>
               </div>
             </div>
 
 
-            <div v-if="errorRequest" class="flex gap-2">
-              <img src="/public/favicon.ico" width="50" alt="">
-              <div class="bg-gray-100 flex items-center px-2 rounded-md text-black">
-                Inserte token, yo no hablo gratis
+          </div>
+
+          <div style="height: 8%;" class="bg-orange-400 p-4 flex items-end">
+            <div class="w-full">
+              <div class="flex gap-2 h-full justify-self-end">
+                <input id="prompt" placeholder="Escribe tu mensaje"
+                       class="w-full bg-gray-200 justify-end px-4 rounded-md text-black" type="text">
+                <button @click="sendToGpt()" class="bg-gray-400 px-2 rounded-md p-2 ">Enviar</button>
               </div>
             </div>
           </div>
+        </div>
 
+        <div class="bg-orange-200 col-span-2">da</div>
 
         </div>
 
-        <div class="h-1/6 bg-orange-400 p-4">
-          <div class="w-full">
-            <div class="flex gap-2 h-full justify-self-end">
-              <input id="prompt" placeholder="Escribe tu mensaje"
-                     class="w-full bg-gray-200 justify-end px-4 rounded-md text-black" type="text">
-              <button @click="sendToGpt()" class="bg-gray-400 px-2 rounded-md p-2 ">Enviar</button>
-            </div>
-          </div>
-        </div>
       </div>
-
     </div>
-  </div>
 
+  </div>
 </template>
 
 

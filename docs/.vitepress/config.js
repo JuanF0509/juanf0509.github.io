@@ -31,7 +31,8 @@ export default defineConfig({
         items: [
           { text: 'Introducción', link: '/introduction' },
           { text: '¿Cómo funcionan?', link: '/about-it' },
-          { text: 'Antes de empezar', link: '/before-starting'}
+          { text: 'Antes de empezar', link: '/before-starting'},
+          { text: 'Equipo de producto', link: '/team'}
         ]
       },
       {
