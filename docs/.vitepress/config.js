@@ -30,15 +30,23 @@ export default defineConfig({
         text: 'Micrositios',
         items: [
           { text: 'Introducción', link: '/introduction' },
-          { text: '¿Cómo funcionan?', link: '/about-it' }
+          { text: '¿Cómo funcionan?', link: '/about-it' },
+          { text: 'Antes de empezar', link: '/before-starting'}
         ]
       },
       {
-        text: 'Integración',
+        text: 'Configuración',
         items: [
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' },
-          { text: 'banana', link: '/public/banana' },
+          { text: 'Configuración inicial', link: '/initial-settings' },
+          { text: 'Creación de micrositios', link: '/create-microsites' },
+          { text: 'Consejos y buenas prácticas', link: '/creation-advices' }
+        ]
+      },
+      {
+        text: 'Nuestros productos',
+        items: [
+          { text: 'Webcheckout docs', link: 'https://docs-gateway.placetopay.com/docs/webcheckout-docs/14206cdfa4c0f-placeto-pay-checkout' },
+          { text: 'Gateway API', link: 'https://docs-gateway.placetopay.com/docs/api-services-docs/14206cdfa4c0f-integracion-con-gateway' },
         ]
       }
     ],
