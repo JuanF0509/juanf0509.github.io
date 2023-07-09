@@ -95,13 +95,16 @@ const memory = new BufferMemory()
 
 // const template = "Name: {name}, Context: You are responding to the inquiries of a {user}, data: 'Webcheckout_id: 1, Microsites_id: 2, ApiGateway_id: 3', condition1: you must respond in Spanish, condition2:Your first message should be a greeting and a question about how you can help the user, condition3: You cannot mention the data to the user in the first message,  user says: "
 
-const template = "Name: {name}, Role: {role} Task: Virtual assistant specialized in PlaceToPay's products and implementation assistance, which is part of Evertec. Currently only accounts access to Microsite documentation, introduction to microsites: {introduction}, Condition1: You can only answer questions related to your Role Condition2: Be a very cheerful assistant who always wants to help Condition3: If you do not have information to answer a question you must indicate that you do not have this information Condition4: You are not allowed to give wrong information Condition5: You must answer in {language}. User says:"
+// const template = "Name: {name}, Role: {role} Task: Virtual assistant specialized in PlaceToPay's products and implementation assistance, which is part of Evertec. Currently only accounts access to Microsite documentation, introduction to microsites: {introduction}, Condition1: You can only answer questions related to your Role Condition2: Be a very cheerful assistant who always wants to help Condition3: If you do not have information to answer a question you must indicate that you do not have this information Condition4: You are not allowed to give wrong information Condition5: You must answer in {language}. User says:"
 
+const template = "Name {name} \n Role{role}\n Task:Virtual assistant specialized in PlaceToPay's products and implementation assistance, which is part of Evertec. Currently only accounts access to Microsite documentation\nintroduction to microsites: {introduction}\n how does microsites work?: {how_do_work}\n before starting: {before_starting}\n future updates of microsites: {updates}\n Condition1 You can only answer questions related to your Role \n Condition2 Be a very objective assistant who always wants to help \n Condition3 If you do not have information to answer a question you must indicate that you do not have this information \n Condition4 You are not allowed to give wrong information \n Condition5 You must answer in {language}. User says:"
 
 const promptTemplate = new PromptTemplate({
   template: template,
-  inputVariables: ["name", "role", "language", "introduction"]
+  inputVariables: ["name", "role", "language", "introduction", "how_do_work", "before_starting", "updates"]
 })
+
+
 
 // const chain = new LLMChain({
 //   llm: model,
@@ -132,6 +135,8 @@ async function sendToGpt() {
     model_name: 'gpt-3.5-turbo-16k-0613',
     openAIApiKey: API_KEY,
     temperature: 0,
+    maxTokens: 256,
+    streaming: true,
   })
 
   const chain = new ConversationChain({
@@ -157,10 +162,13 @@ async function sendToGpt() {
 
 
   formattedPrompt.value = await promptTemplate.format({
-    name: 'Kike Bot',
+    name: 'Implementation bot',
     role: "PlacetoPay's virtual assistant",
     language: 'Spanish',
-    introduction: page1.value
+    how_do_work: page2.value,
+    introduction: page1.value,
+    before_starting: page3.value,
+    updates: page4.value
   })
 
   if (initial1.value === true) {
@@ -177,7 +185,15 @@ async function sendToGpt() {
 
     const res3 = await chain.call({
       input: jum.value
-    })
+    }, [
+      {
+        handleLLMNewToken(token) {
+          process.stdout.write(token);
+        },
+      },
+    ])
+
+    console.log(res3)
 
     messages.value.message.push({
       user: {
@@ -362,161 +378,270 @@ const banana = async () => {
 </script>
 
 <template>
-  <div v-if="loading === true" id="loader"
-       class="fixed top-0 left-0 w-screen h-screen bg-gray-800 bg-opacity-75 flex justify-center items-center">
-    <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
-    <h2 class="text-center text-white text-xl font-semibold">Cargando...</h2>
-  </div>
 
-
-  <!--          nav-->
-  <div class="h-screen">
-    <div class="bg-gray-400 rounded-md h-full">
-
-
-      <div class="bg-gray-300 h-full">
-
-        <div class="fixed w-full bg-black rounded-b-lg p-5 grid grid-cols-5 col-span-12">
-          <div>
-            <button @click="findWithCheerio('introduction.html', 1)">Cheerio</button>
-
-<!--            {{ initial1 }}-->
-<!--            {{ jum }}-->
-          </div>
-          <input v-model="apiKey" id="api_key" class="bg-gray-300 text-black" placeholder="Api key" type="text">
-          <div class="flex">
-            <img width="48" src="/public/favicon.ico" alt="">
-            <p>
-              <span class='text-gray-300 text-4xl font-bold'>Chatbot</span>
-              <span class='text-gray-300  font-bold'>   by   </span>
-              <span class='text-gray-500 text-xl font-bold'>Place</span>
-              <span class='text-orange-500 text-xl font-bold'>To</span>
-              <span class='text-gray-500 text-xl font-bold'>Pay</span>
-            </p>
-          </div>
-          <button onclick="alert('La ayuda es pa los feos')" class="text-white">Ayuda</button>
-          <button onclick="alert('La ayuda es pa los feos')" class="text-white">Ayuda</button>
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <div class="text-white w-1/4">
+      <div class="fixed w-1/4 p-4 h-full">
+        <a href="/" target="_blank"><img src="/public/P2P_Logo.svg" alt=""></a>
+        <h1 class="mb-5 mt-10 font-bold text-2xl">Configuracion:</h1>
+        <label class="font-bold " for="">OpenAI Key:&nbsp;&nbsp;&nbsp;</label>
+        <input v-model="apiKey" id="api_key" class="bg-gray-100 text-black rounded-md p-2" placeholder="OPENAI API KEY"
+               type="text">
+        <div class="py-2">
+          <button class="bg-red-300 p-2 rounded-md" @click="findWithCheerio('introduction.html', 1)">Cheerio</button>
         </div>
+        <h1 class="mb-5 mt-10 font-bold text-2xl text-center mr-8">ChatBots:</h1>
+        <div class="py-2 gap-5 grid grid-cols-2 mr-8 font-bold">
+          <button class="bg-orange-400 p-2 rounded-md" @click="findWithCheerio('introduction.html', 1)">Asistente
+          </button>
+          <button class="bg-red-400 p-2 rounded-md" @click="findWithCheerio('introduction.html', 1)">Integraciones
+          </button>
+          <button class="bg-green-400 p-2 rounded-md col-span-2" @click="findWithCheerio('introduction.html', 1)">Gente
+            y cultura
+          </button>
+        </div>
+      </div>
+      <!-- Sidebar content here -->
+    </div>
 
+    <!-- Main Content -->
+    <div class="flex flex-col flex-grow">
+      <!-- Navbar -->
+      <div class="bg-[#1e1e20] text-white p-4">
+        <div class="flex justify-center">
+          <img width="48" src="/public/favicon.ico" alt="">
+          <p>
+            <span class='text-gray-300 text-4xl font-bold pl-2'>Chatbot</span>
+            <span class='text-gray-300  font-bold'>   by   </span>
+            <span class='text-gray-500 text-xl font-bold'>Place</span>
+            <span class='text-orange-500 text-xl font-bold'>To</span>
+            <span class='text-gray-500 text-xl font-bold'>Pay</span>
+            <span class='text-gray-300 pl-2'>( Beta 1.0 )</span>
+          </p>
+        </div>
+        <!-- Navbar content here -->
+      </div>
 
-          <div id="" class="grid grid-cols-12 h-full">
-
-          <div class="bg-orange-200 col-span-2">da</div>
-
-        <div class="h-full flex-col col-span-8">
-
-          <div ref="messagesContainer" style="height: 92%;" class=" p-4 overflow-y-auto scroll-smooth">
-
-            <!--          Placeholder-->
-
-            <div v-if="!question" class="h-full flex justify-center items-center">
-              <div class="p-10 rounded-md opacity-50 hover:opacity-100 duration-300 select-none">
-                <div class="flex justify-center items-center gap-5">
-                  <img width="300" src="https://static.placetopay.com/placetopay-logo-black.svg"
-                       class="attachment-0x0 size-0x0" alt="" decoding="async" loading="lazy">
-                  <span class="text-black font-bold text-4xl">x</span>
-                  <img width="300" src="/public/OpenAI_Logo.svg" alt="">
-                </div>
-
-                <div class="text-gray-500 grid grid-cols-3 pt-16">
-                  <div class="flex gap-2 border-r-2 border-dashed border-black px-2">
-                    <div>
-                      <img width="35" src="/public/clipboard1.svg" alt="">
-                    </div>
-                    <div>
-                      <div class="flex items-center text-black font-bold text-xl">Caracteristicas:</div>
-                      <div class="pt-2">* Personalizacion</div>
-                      <div>* Análisis</div>
-                      <div>* Recomendaciones</div>
-                      <div>* Respuestas inmediatas</div>
-                    </div>
-                  </div>
-                  <div class="flex justify-center gap-2 px-2">
-                    <div>
-                      <img width="35" src="/public/clipboard2.svg" alt="">
-                    </div>
-                    <div>
-                      <div class="flex items-center text-black font-bold text-xl">Beneficios:</div>
-                      <div class="pt-2">- Acceso rapido</div>
-                      <div>a la informacion</div>
-                      <div>- Atencion personalizada</div>
-                      <div>- Soluciones</div>
-                    </div>
-                  </div>
-                  <div class="flex justify-start gap-2 border-l-2 border-dashed border-black px-2">
-                    <div>
-                      <img width="35" src="/public/clipboard3.svg" alt="">
-                    </div>
-                    <div>
-                      <div class="flex items-center text-black font-bold text-xl">Alcance:</div>
-                      <div class="pt-2">* Automatizacion de</div>
-                      <div>procesos</div>
-                      <div>* Monitoreo de datos</div>
-                      <div>* Productividad</div>
-                    </div>
-                  </div>
-                </div>
-
+      <!-- Chatbot -->
+      <div class="flex-grow flex flex-col">
+        <div id="mensajes" :class="[`flex-grow duration-300`, question ? `bg-gray-300` : `bg-settings`]">
+          <div v-if="!question" class="h-full flex justify-center items-center">
+            <div class="p-10 rounded-md opacity-50 hover:opacity-100 duration-300 select-none">
+              <div class="flex justify-center items-center gap-5">
+                <img width="300" src="https://static.placetopay.com/placetopay-logo-black.svg"
+                     class="attachment-0x0 size-0x0" alt="" decoding="async" loading="lazy">
+                <span class="text-black font-bold text-4xl">x</span>
+                <img width="300" src="/public/OpenAI_Logo.svg" alt="">
               </div>
+
+              <div class="text-gray-500 grid grid-cols-3 pt-16">
+                <div class="flex gap-2 border-r-2 border-dashed border-black px-2">
+                  <div>
+                    <img width="35" src="/public/clipboard1.svg" alt="">
+                  </div>
+                  <div>
+                    <div class="flex items-center text-black font-bold text-xl">Caracteristicas:</div>
+                    <div class="pt-2">* Personalizacion</div>
+                    <div>* Análisis</div>
+                    <div>* Recomendaciones</div>
+                    <div>* Respuestas inmediatas</div>
+                  </div>
+                </div>
+                <div class="flex justify-center gap-2 px-2">
+                  <div>
+                    <img width="35" src="/public/clipboard2.svg" alt="">
+                  </div>
+                  <div>
+                    <div class="flex items-center text-black font-bold text-xl">Beneficios:</div>
+                    <div class="pt-2">- Acceso rapido</div>
+                    <div>a la informacion</div>
+                    <div>- Atencion personalizada</div>
+                    <div>- Soluciones</div>
+                  </div>
+                </div>
+                <div class="flex justify-start gap-2 border-l-2 border-dashed border-black px-2">
+                  <div>
+                    <img width="35" src="/public/clipboard3.svg" alt="">
+                  </div>
+                  <div>
+                    <div class="flex items-center text-black font-bold text-xl">Alcance:</div>
+                    <div class="pt-2">* Automatizacion de</div>
+                    <div>procesos</div>
+                    <div>* Monitoreo de datos</div>
+                    <div>* Productividad</div>
+                  </div>
+                </div>
+              </div>
+
             </div>
+          </div>
 
-            <!--          Placeholder-->
+          <div :class="['pt-5', loading ? '' : 'pb-36' ]">
+            <div v-for="message in messages.message">
 
-
-            <!--                      Respuesta bot-->
-
-            <div v-if="question">
-              <div v-for="message in messages.message">
-                <div class="flex pt-28 justify-end gap-2">
-                  <div class="bg-gray-100 flex items-center px-2 rounded-md text-black">
+              <div class="px-28">
+                <div class="flex justify-end gap-2 pb-5">
+                  <div class="bg-gray-50 flex items-center px-2 rounded-md text-black" style="max-width: 800px;">
                     {{ message.user.text }}
                   </div>
-                  <div class="bg-blue-800 p-5 rounded-full">{{ null }}</div>
+                  <div class="flex items-start">
+                    <img class="bg-gray-200 rounded-full p-1" src="/public/user-icon.svg" width="50" alt="">
+                  </div>
                 </div>
 
-                <div class="grid grid-cols-12 gap-2 mt-5 mr-12">
-                  <div class="flex justify-center items-start">
+                <div class="flex gap-2 pb-5">
+                  <div class="flex items-start">
                     <img class="bg-gray-200 rounded-full p-1" src="/public/favicon.ico" width="50" alt="">
                   </div>
-                  <div class="col-span-11 flex items-center">
-                    <div class="flex bg-gray-100 p-2 rounded-md text-black">
+                  <div class="flex items-center">
+                    <div class="flex bg-gray-50 p-2 rounded-md text-black" style="max-width: 800px;">
                       {{ message.bot.text }}
                     </div>
                   </div>
                 </div>
+
               </div>
 
+              <!--                  <div class="grid grid-cols-12 gap-2 mt-5 mr-12">-->
+              <!--                    <div class="flex justify-center items-start">-->
+              <!--                      <img class="bg-gray-200 rounded-full p-1" src="/public/favicon.ico" width="50" alt="">-->
+              <!--                    </div>-->
+              <!--                    <div class="col-span-11 flex items-center">-->
+              <!--                      <div class="flex bg-gray-100 p-2 rounded-md text-black">-->
+              <!--                        {{ message.bot.text }}-->
+              <!--                      </div>-->
+              <!--                    </div>-->
+              <!--                  </div>-->
+            </div>
 
-              <div v-if="errorRequest" class="flex gap-2">
-                <img src="/public/favicon.ico" width="50" alt="">
-                <div class="bg-gray-100 flex items-center px-2 rounded-md text-black">
-                  Inserte token, yo no hablo gratis
+
+            <div v-if="errorRequest" class="flex gap-2">
+              <img src="/public/favicon.ico" width="50" alt="">
+              <div class="bg-gray-100 flex items-center px-2 rounded-md text-black">
+                Inserte token, yo no hablo gratis
+              </div>
+            </div>
+          </div>
+
+          <div v-if="loading === true" class="pt-5 pb-36">
+            <div>
+              <div class="px-28">
+                <div class="flex justify-end gap-2 pb-5">
+                  <div class="bg-gray-50 flex items-center px-2 rounded-md text-black" style="max-width: 815px;">
+                    {{ input }}
+                  </div>
+                  <div class="flex items-start">
+                    <img class="bg-gray-200 rounded-full p-1" src="/public/user-icon.svg" width="50" alt="">
+                  </div>
                 </div>
+
+                <div class="flex gap-2 pb-5">
+                  <div class="flex items-start">
+                    <img class="bg-gray-200 rounded-full p-1" src="/public/favicon.ico" width="50" alt="">
+                  </div>
+                  <div class="flex items-center">
+                    <div class="flex bg-gray-50 p-3 rounded-md text-black" style="max-width: 815px;">
+                      <div class="dot-wave">
+                        <div class="dot-wave__dot"></div>
+                        <div class="dot-wave__dot"></div>
+                        <div class="dot-wave__dot"></div>
+                        <div class="dot-wave__dot"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </div>
+
+              <!--                  <div class="grid grid-cols-12 gap-2 mt-5 mr-12">-->
+              <!--                    <div class="flex justify-center items-start">-->
+              <!--                      <img class="bg-gray-200 rounded-full p-1" src="/public/favicon.ico" width="50" alt="">-->
+              <!--                    </div>-->
+              <!--                    <div class="col-span-11 flex items-center">-->
+              <!--                      <div class="flex bg-gray-100 p-2 rounded-md text-black">-->
+              <!--                        {{ message.bot.text }}-->
+              <!--                      </div>-->
+              <!--                    </div>-->
+              <!--                  </div>-->
             </div>
 
 
-          </div>
-
-          <div style="height: 8%;" class="bg-orange-400 p-4 flex items-end">
-            <div class="w-full">
-              <div class="flex gap-2 h-full justify-self-end">
-                <input id="prompt" placeholder="Escribe tu mensaje"
-                       class="w-full bg-gray-200 justify-end px-4 rounded-md text-black" type="text">
-                <button @click="sendToGpt()" class="bg-gray-400 px-2 rounded-md p-2 ">Enviar</button>
+            <div v-if="errorRequest" class="flex gap-2">
+              <img src="/public/favicon.ico" width="50" alt="">
+              <div class="bg-gray-100 flex items-center px-2 rounded-md text-black">
+                Inserte token, yo no hablo gratis
               </div>
             </div>
           </div>
         </div>
-
-        <div class="bg-orange-200 col-span-2">da</div>
-
+        <div class="flex items-center bg-orange-500 py-5 px-28 fixed bottom-0 right-0 w-3/4">
+          <input id="prompt" placeholder="Escribe tu mensaje"
+                 class="w-full bg-gray-200 p-3 rounded-md text-black" type="text">
+          <button @click="sendToGpt()" class="bg-gray-400 px-10 ml-2 rounded-md p-3">Enviar</button>
         </div>
-
       </div>
     </div>
-
   </div>
+
 </template>
+
+<style>
+
+.bg-settings {
+  background: url('/public/floating-cogs.svg');
+  background-size: 1300px;
+  background-color: #f1f5f9;
+}
+
+.dot-wave {
+  --uib-size: 50px;
+  --uib-speed: 0.6s;
+  --uib-color: #0d0909;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-between;
+  width: var(--uib-size);
+  height: calc(var(--uib-size) * 0.17);
+  padding-top: calc(var(--uib-size) * 0.34);
+}
+
+.dot-wave__dot {
+  flex-shrink: 0;
+  width: calc(var(--uib-size) * 0.17);
+  height: calc(var(--uib-size) * 0.17);
+  border-radius: 50%;
+  background-color: var(--uib-color);
+  will-change: transform;
+}
+
+.dot-wave__dot:nth-child(1) {
+  animation: jump824 var(--uib-speed) ease-in-out calc(var(--uib-speed) * -0.45) infinite;
+}
+
+.dot-wave__dot:nth-child(2) {
+  animation: jump824 var(--uib-speed) ease-in-out calc(var(--uib-speed) * -0.3) infinite;
+}
+
+.dot-wave__dot:nth-child(3) {
+  animation: jump824 var(--uib-speed) ease-in-out calc(var(--uib-speed) * -0.15) infinite;
+}
+
+.dot-wave__dot:nth-child(4) {
+  animation: jump824 var(--uib-speed) ease-in-out infinite;
+}
+
+@keyframes jump824 {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-200%);
+  }
+}
+</style>
 
 

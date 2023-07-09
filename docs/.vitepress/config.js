@@ -32,7 +32,7 @@ export default defineConfig({
           { text: 'Introducción', link: '/introduction' },
           { text: '¿Cómo funcionan?', link: '/about-it' },
           { text: 'Antes de empezar', link: '/before-starting'},
-          { text: 'Equipo de producto', link: '/team'}
+          { text: 'Actualizaciones', link: '/team'}
         ]
       },
       {
