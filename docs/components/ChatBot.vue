@@ -7,7 +7,7 @@ import {PromptTemplate} from 'langchain/prompts';
 import {LLMChain, ConversationChain} from 'langchain/chains';
 import {BufferMemory} from 'langchain/memory'
 
-import {PuppeteerWebBaseLoader} from "langchain/document_loaders/web/puppeteer";
+//import {PuppeteerWebBaseLoader} from "langchain/document_loaders/web/puppeteer";
 import {CheerioWebBaseLoader} from "langchain/document_loaders/web/cheerio";
 
 let url1 = ref('introduction.html')
